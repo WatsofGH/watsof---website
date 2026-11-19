@@ -1,0 +1,192 @@
+.hero {
+  position: relative;
+  min-height: max(100svh, 40rem);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr auto auto;
+  column-gap: var(--gutter);
+  padding: 0 var(--page-margin) var(--space-6);
+  overflow: hidden;
+  isolation: isolate;
+  touch-action: pan-y;
+}
+
+/* The painted scene and the measured overlay */
+.hero__scene {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  cursor: crosshair;
+}
+.hero__paint,
+.hero__measure {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Without WebGL: the brand watercolour itself, settling into fog at the bottom */
+.hero__scene {
+  background-color: var(--fog-100);
+}
+.hero--nogl .hero__scene {
+  background-image:
+    linear-gradient(to bottom, rgb(233 235 236 / 0.55) 0%, rgb(233 235 236 / 0.2) 40%, var(--fog-100) 88%),
+    url("/img/watercolour.webp");
+  background-position: center, center 65%;
+  background-size: cover, cover;
+  background-repeat: no-repeat;
+}
+.hero--live .hero__paint {
+  animation: hero-in var(--dur-slow) var(--ease-out) both;
+}
+@keyframes hero-in {
+  from { opacity: 0; }
+}
+
+/* Headline */
+.hero__copy {
+  display: contents;
+}
+
+.hero__title {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  padding-top: clamp(7.5rem, 15vh, 11rem);
+  font-size: var(--step-hero);
+  font-weight: var(--weight-display);
+  font-stretch: var(--stretch-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  text-wrap: balance;
+}
+.hero__line {
+  display: block;
+}
+.hero__line + .hero__line {
+  padding-left: 0.9em;
+}
+
+/* Lede, CTA */
+.hero__foot {
+  grid-column: 1 / span 5;
+  grid-row: 3;
+  display: grid;
+  gap: var(--space-5);
+  max-width: var(--measure);
+}
+.hero__lede {
+  font-size: var(--step-1);
+  line-height: 1.4;
+}
+.hero__cta {
+  justify-self: start;
+  display: inline-flex;
+  gap: var(--space-3);
+  font-weight: var(--weight-strong);
+  text-decoration: none;
+  padding-bottom: var(--space-1);
+  border-bottom: 2px solid var(--ink);
+}
+.hero__cta span {
+  color: var(--color-accent);
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.hero__cta:hover span {
+  transform: translateX(0.25em);
+}
+
+/* Readout column */
+.hero__readout {
+  grid-column: 10 / -1;
+  grid-row: 3;
+  align-self: end;
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3) var(--space-3);
+  border: var(--hairline) solid var(--color-line);
+  background: rgb(233 235 236 / 0.82);
+  color: var(--slate-700);
+}
+.hero__readout div {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-top: var(--space-2);
+  border-top: var(--hairline) solid var(--color-line);
+}
+.hero__readout div:first-child {
+  border-top: 0;
+}
+.hero__readout dd {
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.hero__hint {
+  grid-column: 10 / -1;
+  grid-row: 4;
+  margin-top: var(--space-4);
+  color: var(--slate-700);
+  text-transform: none;
+}
+
+/* Below 60em: stack */
+@media (max-width: 60em) {
+  .hero__foot {
+    grid-column: 1 / span 8;
+  }
+  .hero__readout,
+  .hero__hint {
+    grid-column: 9 / -1;
+  }
+}
+
+@media (max-width: 40em) {
+  .hero {
+    grid-template-rows: auto 1fr auto auto auto;
+    padding-bottom: var(--space-5);
+  }
+  .hero__title {
+    padding-top: 6.5rem;
+  }
+  .hero__line + .hero__line {
+    padding-left: 0;
+  }
+  .hero__foot {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+  .hero__lede {
+    font-size: var(--step-0);
+  }
+  .hero__readout {
+    grid-column: 1 / -1;
+    grid-row: 4;
+    grid-template-columns: 1fr 1fr;
+    column-gap: var(--gutter);
+    margin-top: var(--space-6);
+  }
+  .hero__readout div {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .hero__readout div:first-child,
+  .hero__readout div:last-child {
+    display: none;
+  }
+  .hero__hint {
+    grid-column: 1 / -1;
+    grid-row: 5;
+    margin-top: var(--space-3);
+  }
+}
+
+/* Placeholder until Stage 2 */
+.stage-placeholder {
+  min-height: 80vh;
+  padding: var(--space-9) var(--page-margin);
+  border-top: var(--hairline) solid var(--color-line);
+  color: var(--slate-700);
+}

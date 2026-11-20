@@ -11,6 +11,13 @@
   font-display: swap;
 }
 @font-face {
+  font-family: "Tourney";
+  src: url("/fonts/tourney-var.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-display: swap;
+}
+@font-face {
   font-family: "IBM Plex Mono";
   src: url("/fonts/plex-mono-400.woff2") format("woff2");
   font-weight: 400;
@@ -53,13 +60,14 @@
   --color-focus: var(--rust);
 
   /* Type */
+  --font-display: "Tourney", "Archivo", "Helvetica Neue", Arial, sans-serif; /* the wordmark's face */
   --font-sans: "Archivo", "Helvetica Neue", Arial, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --stretch-display: 116%;
+  --stretch-display: 108%;           /* Tourney width for display */
   --stretch-text: 100%;
   --weight-text: 400;
   --weight-strong: 600;
-  --weight-display: 760;
+  --weight-display: 900;             /* Tourney below ~850 turns into an inline outline */
 
   /* Fluid type scale, 360px → 1920px */
   --step--2: clamp(0.6875rem, 0.67rem + 0.08vw, 0.75rem);   /* mono labels */
@@ -69,12 +77,12 @@
   --step-2: clamp(1.5rem, 1.3rem + 0.9vw, 2.25rem);
   --step-3: clamp(2rem, 1.6rem + 1.8vw, 3.5rem);
   --step-4: clamp(2.5rem, 1.8rem + 3.2vw, 5.5rem);
-  --step-hero: clamp(2.6rem, 0.6rem + 6.4vw, 8.5rem);
+  --step-hero: clamp(2.4rem, 0.5rem + 5.7vw, 7.75rem);
 
   --leading-tight: 0.92;
   --leading-snug: 1.2;
   --leading-body: 1.55;
-  --tracking-display: -0.022em;
+  --tracking-display: 0.01em;
   --tracking-mono: 0.04em;
 
   /* Space, 4px base */

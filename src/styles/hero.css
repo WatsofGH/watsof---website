@@ -54,6 +54,8 @@
   grid-column: 1 / -1;
   grid-row: 1;
   padding-top: clamp(7.5rem, 15vh, 11rem);
+  font-family: var(--font-display);
+  text-transform: uppercase;
   font-size: var(--step-hero);
   font-weight: var(--weight-display);
   font-stretch: var(--stretch-display);

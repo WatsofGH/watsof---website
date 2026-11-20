@@ -74,8 +74,6 @@ export function initHero(hero) {
     fog: cssVar('--fog-100'),
     accent: cssVar('--rust'),
     muted: cssVar('--slate-700'),
-    line: 'rgba(61,54,45,0.35)',
-    grid: 'rgba(61,54,45,0.12)',
     mono: '"IBM Plex Mono", ui-monospace, monospace',
   };
 
@@ -152,7 +150,7 @@ export function initHero(hero) {
   }
 
   function drawCursorReadout() {
-    if (!mouse.inside || coarse) return;
+    if (!mouse.inside || coarse || strokes.drawing) return; // stay out of the way while painting
     const label = `${(mouse.px / W).toFixed(3)}  ${(mouse.py / H).toFixed(3)}`;
     mctx.font = `400 10.5px ${colors.mono}`;
     mctx.fillStyle = colors.muted;

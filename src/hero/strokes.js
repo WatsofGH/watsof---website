@@ -8,7 +8,7 @@
 */
 
 export const DRY_MS = 1600;      // wet → dry
-const HOLD_MS = 5200;            // measured geometry stays this long after drying
+const HOLD_MS = 3400;            // measured geometry stays this long after drying
 const FADE_MS = 1200;            // then fades out
 const STAIN_FADE_EVERY = 220;    // ms between stain fade steps
 const WET_SCALE = 0.25;          // wet canvas resolution relative to CSS px
@@ -269,47 +269,33 @@ export class Strokes {
   }
 }
 
+/*
+  The measured layer is kept quiet on purpose: it should read as a pencil
+  annotation on the painting, not as UI. One hairline, small dots, two
+  corner ticks and one short label.
+*/
 function drawMeasured(ctx, s, grow, alpha, c) {
   const { box, simple } = s;
   ctx.save();
-  ctx.globalAlpha = alpha;
   ctx.lineWidth = 1;
 
-  // local grid inside the bounding box
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(box.x, box.y, box.w, box.h);
-  ctx.clip();
-  ctx.strokeStyle = c.grid;
-  ctx.globalAlpha = alpha * grow;
-  ctx.beginPath();
-  const step = 16;
-  const x0 = Math.floor(box.x / step) * step;
-  const y0 = Math.floor(box.y / step) * step;
-  for (let x = x0; x < box.x + box.w; x += step) { ctx.moveTo(x + 0.5, box.y); ctx.lineTo(x + 0.5, box.y + box.h); }
-  for (let y = y0; y < box.y + box.h; y += step) { ctx.moveTo(box.x, y + 0.5); ctx.lineTo(box.x + box.w, y + 0.5); }
-  ctx.stroke();
-  ctx.restore();
-
-  // corner ticks
+  // two opposite corner ticks instead of a full box
   ctx.strokeStyle = c.ink;
-  ctx.globalAlpha = alpha * grow;
-  const k = 10;
-  ctx.beginPath();
+  ctx.globalAlpha = alpha * grow * 0.35;
+  const k = 6;
   const { x, y, w, h } = box;
+  ctx.beginPath();
   ctx.moveTo(x, y + k); ctx.lineTo(x, y); ctx.lineTo(x + k, y);
-  ctx.moveTo(x + w - k, y); ctx.lineTo(x + w, y); ctx.lineTo(x + w, y + k);
-  ctx.moveTo(x + w, y + h - k); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w - k, y + h);
-  ctx.moveTo(x + k, y + h); ctx.lineTo(x, y + h); ctx.lineTo(x, y + h - k);
+  ctx.moveTo(x + w - k, y + h); ctx.lineTo(x + w, y + h); ctx.lineTo(x + w, y + h - k);
   ctx.stroke();
 
-  // polyline drawn along its length as the paint dries
-  ctx.globalAlpha = alpha;
+  // the simplified line, drawn along its length as the paint dries
+  ctx.globalAlpha = alpha * 0.55;
   const target = s.simpleLength * grow;
   let acc = 0;
+  let shown = 1;
   ctx.beginPath();
   ctx.moveTo(simple[0].x, simple[0].y);
-  let shown = 1;
   for (let i = 1; i < simple.length; i++) {
     const a = simple[i - 1], b = simple[i];
     const seg = Math.hypot(b.x - a.x, b.y - a.y);
@@ -325,41 +311,36 @@ function drawMeasured(ctx, s, grow, alpha, c) {
   }
   ctx.stroke();
 
-  // vertices
+  // vertices as small dots; the first one in the accent
   for (let i = 0; i < shown; i++) {
     const v = simple[i];
-    const size = i === 0 ? 6 : 5;
-    ctx.fillStyle = i === 0 ? c.accent : c.fog;
-    ctx.strokeStyle = i === 0 ? c.accent : c.ink;
-    ctx.fillRect(Math.round(v.x - size / 2), Math.round(v.y - size / 2), size, size);
-    ctx.strokeRect(Math.round(v.x - size / 2) + 0.5, Math.round(v.y - size / 2) + 0.5, size - 1, size - 1);
+    ctx.globalAlpha = alpha * (i === 0 ? 0.9 : 0.6);
+    ctx.fillStyle = i === 0 ? c.accent : c.ink;
+    ctx.beginPath();
+    ctx.arc(v.x, v.y, i === 0 ? 2.5 : 1.75, 0, Math.PI * 2);
+    ctx.fill();
   }
 
-  // label tag above the box
-  if (grow > 0.35) {
-    const la = alpha * clamp01((grow - 0.35) / 0.3);
-    const tag = `S-${String(s.id).padStart(2, '0')}`;
-    const rest = `  ${s.points.length} SAMPLES → ${simple.length} VERTICES`;
-    const line2 = `${Math.round(box.w)} × ${Math.round(box.h)} PX · ${s.duration.toFixed(2)} S`;
-    ctx.font = `500 11px ${c.mono}`;
-    const tagW = ctx.measureText(tag).width;
-    const tw = Math.max(tagW + ctx.measureText(rest).width, ctx.measureText(line2).width);
-    let lx = Math.round(box.x);
-    let ly = Math.round(box.y - 44);
-    if (ly < 80) ly = Math.round(box.y + box.h + 10);
-    lx = Math.max(8, Math.min(lx, ctx.canvas.clientWidth - tw - 24));
-    ctx.globalAlpha = la * 0.88;
-    ctx.fillStyle = c.fog;
-    ctx.fillRect(lx, ly, tw + 16, 38);
+  // one short label next to the last vertex, no box
+  if (grow > 0.6) {
+    const la = alpha * clamp01((grow - 0.6) / 0.3) * 0.85;
+    const last = simple[simple.length - 1];
+    const label = `${s.points.length} → ${simple.length} pts`;
+    ctx.font = `400 10px ${c.mono}`;
+    const tw = ctx.measureText(label).width;
+    // continue past the end of the stroke, in the direction it was travelling
+    const prev = simple[simple.length - 2] || simple[0];
+    const W = ctx.canvas.clientWidth;
+    let lx = last.x >= prev.x ? last.x + 10 : last.x - tw - 10;
+    let ly = last.y + 3.5;
+    if (lx < 12 || lx + tw > W - 12) {
+      // no room: sit just above the end instead of on top of the paint
+      lx = Math.max(12, Math.min(last.x - tw / 2, W - 12 - tw));
+      ly = last.y - s.width * 0.6 - 6;
+    }
     ctx.globalAlpha = la;
-    ctx.strokeStyle = c.line;
-    ctx.strokeRect(lx + 0.5, ly + 0.5, tw + 15, 37);
-    ctx.fillStyle = c.accent;
-    ctx.fillText(tag, lx + 8, ly + 15);
-    ctx.fillStyle = c.ink;
-    ctx.fillText(rest, lx + 8 + tagW, ly + 15);
     ctx.fillStyle = c.muted;
-    ctx.fillText(line2, lx + 8, ly + 30);
+    ctx.fillText(label, Math.round(lx), Math.round(ly));
   }
   ctx.restore();
 }

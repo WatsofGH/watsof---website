@@ -28,9 +28,9 @@ From the watercolour (luminance percentiles) and the painting (region medians):
 | `--rust-light` | `#C98A62` | Rust for use on pine (4.6:1). |
 
 ## Font check
-The wordmark is **not Space Grotesk**. Space Grotesk has a pointed A, round S and round O. The logo has a vertical-walled A with chamfered shoulders, a stepped S and an octagonal O. I rendered 16 candidates; the closest open-source family is Tektur (same S and O construction), but its A is still pointed, so the logo is either another display face or hand-modified. Check the original design file for the font name.
+The wordmark is set in **Tourney Black** (weight 900), at roughly its default width. W, A, T, S, O and F match glyph for glyph. My first check (Stage 0) compared 16 other faces, missed Tourney, and wrongly called the logo a different face or a hand-modified one. Corrected in Stage 1b.
 
-For site type I use **Archivo** (variable, wide cut at ~115% for headlines) because its wide, heavy proportions sit next to the wordmark without imitating its chamfers. **IBM Plex Mono** for the data layer. Space Grotesk was tested next to the logo and clashes.
+Type system: **Tourney 900, upper case** for display (it is the logo's face; below about weight 850 it turns into an inline outline, so only 900 is used). **Archivo** for body and UI text. **IBM Plex Mono** for the data layer. Space Grotesk was tested next to the logo and clashes.
 
 ## Hero concepts
 **A. Wet ink, dry data.** A WebGL watercolour scene of layered misty ridges, built from the brand's own texture and noise. Ridges drift with cursor and scroll. Dragging paints a wet slate stroke that bleeds into the paper. As it dries (about 1.5 s), the stroke is measured: simplified to a polyline with vertices, boxed, and labelled in mono (`214 samples → 11 vertices`). The paint fades to a stain, the geometry stays for a while. On touch, horizontal drags paint, vertical drags scroll. When nobody touches it, a stroke paints itself every few seconds.

@@ -7,7 +7,7 @@ What makes a site read as generated, and what this site does instead. Checked ag
 |---|---|
 | One headline word in italic/serif/script for "emphasis" | One family for headlines, one roman weight per line. Emphasis comes from size and placement only. |
 | Gradient-filled headline text | Flat ink `#3D362D`. The only gradient on the site is real pigment in the watercolour. |
-| Inter / system UI font | Archivo (variable, wide cut) for text, IBM Plex Mono for the data layer. Both self-hosted. |
+| Inter / system UI font | Tourney (the wordmark's own face) for display, Archivo for text, IBM Plex Mono for the data layer. All self-hosted. |
 | Space Grotesk because "tech brand" | Tested next to the wordmark: its round S/O and quirky y/g fight the octagonal logo. Not used. |
 | Tiny headline under a big animation | The headline is set at 9–10vw and sits *inside* the painted scene; the scene is built around it. |
 

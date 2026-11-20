@@ -697,9 +697,13 @@
   height: 100%;
   overflow: visible;
 }
-.contact__edge path {
+.contact__ridge {
   fill: var(--pine);
-  filter: url(#ragged);
+}
+/* a paler wash bleeding just above the ridge, like a second layer of paint */
+.contact__wash {
+  fill: var(--pine);
+  opacity: 0.25;
 }
 .contact__inner {
   display: grid;

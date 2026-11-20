@@ -13,21 +13,15 @@ npm run dev      # http://localhost:5173
 
 ## Before launch: replace these
 
-All in `src/content.js` unless noted. Search the repo for `[PLACEHOLDER]`.
+All in `src/content.js`. Search the repo for `[PLACEHOLDER]`.
 
 | What | Where |
 |---|---|
-| Public email address | `site.email` |
 | Office hours shown in the contact section | `site.hours` |
-| KvK number (and add BTW if you want it shown) | `site.kvk` |
-| Stack lines per service | `services.items[].stack` |
-| All three portfolio projects: title, client, sector, year, scope, problem, built, outcome | `work.projects[]` |
-| The numbers in project 2 | `work.projects[1].metrics` |
-| The three quotes: text, name, role (only real, approved quotes) | `work.projects[].quote` |
-| The dashboard and messy-table sample data in project 1 | `compareVisual()` in `src/render.js` |
-| The "Placeholder projects" note under the Work heading | `work.placeholderNote` (delete it) |
 
-The `[PLACEHOLDER]` tags on the page come from `work.labels.placeholder`; remove the `${ph}` calls in `src/render.js` once the projects are real.
+## Adding work
+
+The portfolio is empty for now, so the Work section and its nav links are left out of the page. Add projects to `work.projects` in `src/content.js` and the section returns. Each project picks one of three layouts (`compare`, `outcome`, `pipeline`); the fields are listed in the comment above `work`, and commit 9e26e15 has a worked example of each. Only real projects and approved quotes.
 
 ## Where things are
 

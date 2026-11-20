@@ -24,7 +24,7 @@ function loadImage(url) {
   });
 }
 
-export function createScene(canvas, { paperUrl, wetCanvas }) {
+export function createScene(canvas, { paperUrl, wetCanvas, allowSoftware = false }) {
   const gl = canvas.getContext('webgl2', {
     antialias: false,
     alpha: false,
@@ -33,6 +33,15 @@ export function createScene(canvas, { paperUrl, wetCanvas }) {
     preserveDrawingBuffer: false,
   });
   if (!gl) return null;
+
+  // Software rendering (no GPU) can't run the shader smoothly and blocks the
+  // page while it tries: give up early and let the caller use the still image.
+  const dbg = gl.getExtension('WEBGL_debug_renderer_info');
+  const renderer = String(gl.getParameter(dbg ? dbg.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+  if (!allowSoftware && /swiftshader|llvmpipe|softpipe|software|basic render/i.test(renderer)) {
+    gl.getExtension('WEBGL_lose_context')?.loseContext();
+    return null;
+  }
 
   const prog = gl.createProgram();
   gl.attachShader(prog, compile(gl, gl.VERTEX_SHADER, VERT));
@@ -91,6 +100,7 @@ export function createScene(canvas, { paperUrl, wetCanvas }) {
   return {
     ready,
     gl,
+
 
     resize(cssW, cssH, renderScale) {
       scale = renderScale;

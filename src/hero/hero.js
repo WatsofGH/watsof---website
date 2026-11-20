@@ -81,7 +81,7 @@ export function initHero(hero) {
   if (DEBUG) window.__strokes = strokes; // inspect strokes in the console with ?debug
   let gl = null;
   try {
-    gl = createScene(paintCanvas, { paperUrl: PAPER_URL, wetCanvas: strokes.texture });
+    gl = createScene(paintCanvas, { paperUrl: PAPER_URL, wetCanvas: strokes.texture, allowSoftware: PARAMS.has('q') });
   } catch (err) {
     console.warn('[hero] WebGL unavailable, using the still image.', err);
   }
@@ -95,7 +95,8 @@ export function initHero(hero) {
   let nextGhostAt = performance.now() + GHOST_FIRST;
   let visible = true;
   let running = false;
-  let staticMode = reduceMotion.matches || !gl;
+  let tooSlow = false; // set when frames stay too slow even at the lowest resolution
+  let staticMode = reduceMotion.matches || !gl || tooSlow;
   const frameTimes = [];
   const t0 = performance.now();
 
@@ -300,6 +301,10 @@ export function initHero(hero) {
       if (median > 20 && quality > 0.4 && gl && !PARAMS.has('q')) {
         quality = Math.max(0.4, quality * 0.8);
         gl.resize(W, H, Math.min(dpr, 1.5) * quality);
+      } else if (median > 45 && quality <= 0.4 && !PARAMS.has('q')) {
+        // still too slow at the lowest resolution: stop animating, keep a still frame
+        tooSlow = true;
+        setMode();
       }
     }
   }
@@ -339,7 +344,8 @@ export function initHero(hero) {
   }
 
   function setMode() {
-    staticMode = reduceMotion.matches || !gl;
+    staticMode = reduceMotion.matches || !gl || tooSlow;
+    if (hint && !DEBUG) hint.hidden = staticMode; // nothing to paint in a still frame
     if (staticMode) { halt(); drawStill(); } else { strokes.list = []; kick(); }
   }
 

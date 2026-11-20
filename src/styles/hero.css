@@ -184,11 +184,3 @@
     margin-top: var(--space-3);
   }
 }
-
-/* Placeholder until Stage 2 */
-.stage-placeholder {
-  min-height: 80vh;
-  padding: var(--space-9) var(--page-margin);
-  border-top: var(--hairline) solid var(--color-line);
-  color: var(--slate-700);
-}

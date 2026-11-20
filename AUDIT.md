@@ -50,7 +50,7 @@ What makes a site read as generated, and what this site does instead. Checked ag
 | Rule-of-three everywhere | Lists have as many items as are true (2, 4, 5). |
 | Em-dash-heavy rhythm | Full stops and commas. |
 | Vague claims ("we deliver results") | Specific examples: "a weekly Excel report replaced by a pipeline and a dashboard". |
-| "We" pretending to be a team | Watsof is one person, so the copy says "I". (Easy to change in `content.js`.) |
+| Inflated "we" with invented team photos and headcount | The copy says "we" as a company voice and makes no claims about team size, offices or headcount. |
 
 ## Trust signals
 | Tell | Instead |

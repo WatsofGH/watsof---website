@@ -684,22 +684,12 @@
   background: var(--pine);
   color: var(--fog-100);
 }
-/* the brand paper, faintly, so the green reads as paint */
-.contact::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: url("/img/watercolour.webp") center / cover no-repeat;
-  mix-blend-mode: soft-light;
-  opacity: 0.22;
-}
 .contact__edge {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(100% - 2px);
-  height: clamp(3rem, 8vw, 7.5rem);
+  bottom: calc(100% - 1.5rem);
+  height: calc(clamp(3rem, 8vw, 7.5rem) + 1.5rem);
   pointer-events: none;
 }
 .contact__edge svg {

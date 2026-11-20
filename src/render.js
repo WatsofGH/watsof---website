@@ -34,7 +34,7 @@ function svgDefs() {
   ${wash('wash-1', 3)}${wash('wash-2', 11)}${wash('wash-3', 23)}
   <filter id="ragged" x="-2%" y="-10%" width="104%" height="120%">
     <feTurbulence type="fractalNoise" baseFrequency="0.012 0.04" numOctaves="4" seed="9" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="22" xChannelSelector="R" yChannelSelector="G"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
   </filter>
 </svg>`;
 }
@@ -330,7 +330,7 @@ function contactSection() {
   return `
 <section class="contact" id="contact" aria-labelledby="contact-title" data-section="${esc(contact.label)}">
   <div class="contact__edge" aria-hidden="true" data-reveal>
-    <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M-60 140 L-60 78 L0 74 C120 58 210 40 330 52 C450 64 520 30 650 34 C780 38 840 70 960 62 C1080 54 1150 22 1270 30 C1350 35 1400 48 1440 44 L1500 42 L1500 140 Z"/></svg>
+    <svg viewBox="0 0 1440 144" preserveAspectRatio="none"><path d="M-60 170 L-60 78 L0 74 C120 58 210 40 330 52 C450 64 520 30 650 34 C780 38 840 70 960 62 C1080 54 1150 22 1270 30 C1350 35 1400 48 1440 44 L1500 42 L1500 170 Z"/></svg>
   </div>
   <div class="contact__inner">
     <div class="contact__words">

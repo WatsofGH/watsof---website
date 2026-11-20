@@ -13,6 +13,10 @@ const coord = (lat, lon) =>
   `${Math.abs(lat).toFixed(2)}° ${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(2)}° ${lon >= 0 ? 'E' : 'W'}`;
 
 const arrow = '<span class="arrow" aria-hidden="true">→</span>';
+
+/* Work appears only once there are projects */
+const hasWork = work.projects.length > 0;
+const navLinks = nav.links.filter((l) => hasWork || l.href !== '#work');
 const ph = `<span class="ph-tag mono">${esc(work.labels.placeholder)}</span>`;
 
 /* ---------- shared SVG filters: ragged watercolour edges ---------- */
@@ -32,16 +36,12 @@ function svgDefs() {
   </filter>`;
   return `<svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
   ${wash('wash-1', 3)}${wash('wash-2', 11)}${wash('wash-3', 23)}
-  <filter id="ragged" x="-2%" y="-10%" width="104%" height="120%">
-    <feTurbulence type="fractalNoise" baseFrequency="0.012 0.04" numOctaves="4" seed="9" result="n"/>
-    <feDisplacementMap in="SourceGraphic" in2="n" scale="16" xChannelSelector="R" yChannelSelector="G"/>
-  </filter>
 </svg>`;
 }
 
 /* ---------- header ---------- */
 function header() {
-  const links = nav.links.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('');
+  const links = navLinks.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('');
   return `
 <header class="site-header" data-header>
   <a class="site-header__brand" href="#top" aria-label="${esc(site.name)}, back to top">
@@ -60,7 +60,7 @@ function header() {
 </header>
 <div class="menu" id="menu" data-menu hidden>
   <nav aria-label="${esc(nav.label)}, mobile">
-    <ul role="list">${nav.links.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('')}</ul>
+    <ul role="list">${navLinks.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('')}</ul>
   </nav>
   <p class="menu__mail"><a href="mailto:${esc(site.email)}">${esc(site.email)}</a></p>
 </div>`;
@@ -85,8 +85,7 @@ function heroSection() {
     </div>
   </div>
   <dl class="hero__readout mono" aria-hidden="true">
-    <div><dt>${esc(r.vantage)}</dt><dd>${coord(site.location.lat, site.location.lon)}</dd></div>
-    <div><dt>${esc(r.localTime)}</dt><dd data-readout="clock" data-tz="${esc(site.location.timeZone)}">--:--</dd></div>
+    <div><dt>${esc(r.vantage)}</dt><dd>${esc(site.location.vantage)}</dd></div>
     <div><dt>${esc(r.strokes)}</dt><dd data-readout="strokes">0</dd></div>
     <div><dt>${esc(r.reduction)}</dt><dd data-readout="ratio">–</dd></div>
   </dl>
@@ -152,7 +151,6 @@ function servicesSection() {
       <p class="service__lead">${esc(s.lead)}</p>
       <dl class="service__spec">
         <div><dt class="mono">${esc(L.gets)}</dt><dd><ul role="list">${s.gets.map((g) => `<li>${esc(g)}</li>`).join('')}</ul></dd></div>
-        <div><dt class="mono">${esc(L.stack)}</dt><dd>${esc(s.stack)}</dd></div>
       </dl>
       <div class="service__example">
         <p class="service__example-label mono">${esc(L.example)}</p>
@@ -317,20 +315,50 @@ function project(p) {
 }
 
 function workSection() {
+  if (!hasWork) return '';
   return `
 <section class="work" id="work" aria-labelledby="work-title" data-section="${esc(work.label)}">
-  ${sectionHead('work', work.label, work.title, `<p class="work__note mono">${esc(work.placeholderNote)}</p>`)}
+  ${sectionHead('work', work.label, work.title, work.placeholderNote ? `<p class="work__note mono">${esc(work.placeholderNote)}</p>` : '')}
   ${work.projects.map(project).join('')}
 </section>`;
 }
 
 /* ---------- contact ---------- */
+
+/*
+  The painted ridge that opens the contact section. Built as a smooth curve
+  (no SVG filter, so it stays crisp and anti-aliased at every size): a few
+  slow waves plus small, fixed wobbles, joined with quadratic curves.
+  'phase' and 'lift' give the paler wash behind it a slightly different line.
+*/
+function ridgePath({ phase = 0, lift = 0, w = 1440, h = 144 } = {}) {
+  const y = (x) =>
+    70 - lift
+    + 20 * Math.sin(x / 230 + 0.6 + phase)
+    + 9 * Math.sin(x / 97 + 1.7 + phase * 1.6)
+    + 3.5 * Math.sin(x / 41 + 0.3 + phase * 2.3)
+    + 1.2 * Math.sin(x / 17 + phase * 3.1);
+  const pts = [];
+  for (let x = -40; x <= w + 40; x += 16) pts.push([x, y(x)]);
+  const f = (n) => n.toFixed(1);
+  let d = `M${f(pts[0][0])} ${h + 40} L${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 1; i < pts.length - 1; i++) {
+    const mx = (pts[i][0] + pts[i + 1][0]) / 2;
+    const my = (pts[i][1] + pts[i + 1][1]) / 2;
+    d += ` Q${f(pts[i][0])} ${f(pts[i][1])} ${f(mx)} ${f(my)}`;
+  }
+  const last = pts[pts.length - 1];
+  return `${d} L${f(last[0])} ${f(last[1])} L${f(last[0])} ${h + 40} Z`;
+}
 function contactSection() {
   const f = contact.form;
   return `
 <section class="contact" id="contact" aria-labelledby="contact-title" data-section="${esc(contact.label)}">
   <div class="contact__edge" aria-hidden="true" data-reveal>
-    <svg viewBox="0 0 1440 144" preserveAspectRatio="none"><path d="M-60 170 L-60 78 L0 74 C120 58 210 40 330 52 C450 64 520 30 650 34 C780 38 840 70 960 62 C1080 54 1150 22 1270 30 C1350 35 1400 48 1440 44 L1500 42 L1500 170 Z"/></svg>
+    <svg viewBox="0 0 1440 144" preserveAspectRatio="none">
+      <path class="contact__wash" d="${ridgePath({ phase: 1.9, lift: 22 })}"/>
+      <path class="contact__ridge" d="${ridgePath()}"/>
+    </svg>
   </div>
   <div class="contact__inner">
     <div class="contact__words">
@@ -380,7 +408,7 @@ function siteFooter() {
   <p class="site-footer__name">© ${year} ${esc(footer.rights)} <span class="mono">${esc(site.kvk)}</span></p>
   <nav class="site-footer__nav" aria-label="Footer">
     <ul role="list">
-      ${nav.links.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('')}
+      ${navLinks.map((l) => `<li><a href="${esc(l.href)}">${esc(l.text)}</a></li>`).join('')}
       <li><a href="mailto:${esc(site.email)}">${esc(site.email)}</a></li>
     </ul>
   </nav>
